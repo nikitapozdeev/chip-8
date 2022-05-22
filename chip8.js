@@ -332,9 +332,9 @@ class Chip8 {
     this.pc = addr + this.registers[0];
   }
 
-  rndVx(x) {
-    const byte = Math.ceil(Math.random() * 256);
-    this.registers[x] &= byte;
+  rndVx(x, byte) {
+    const rnd = Math.ceil(Math.random() * 256);
+    this.registers[x] = rnd & byte;
   }
 
   drwVxVy(x, y, nibble) {
