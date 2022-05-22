@@ -92,9 +92,10 @@ class Chip8 {
       for (let x = 0; x < WIDTH; x++) {
         if (this.video[y][x] === 1) {
           context.fillStyle = '#FFF';
-          context.fillRect(x, y, 1, 1);
+        } else {
           context.fillStyle = '#000';
-        } 
+        }
+        context.fillRect(x, y, 1, 1);
       }
     }
   }
