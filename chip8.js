@@ -1,4 +1,5 @@
 import { FONT_SPRITES } from "./font.js";
+import Keyboard from "./keyboard.js";
 
 const canvas = document.getElementById('chip8');
 const context = canvas.getContext('2d');
@@ -65,6 +66,7 @@ class Chip8 {
     this.running = false;
 
     this.loadFont();
+    this.keyboard = new Keyboard();
   }
 
   createVideo() {
@@ -360,21 +362,29 @@ class Chip8 {
   }
 
   skpVx(x) {
-    // TODO implement
+    const chip8Key = this.registers[x];
+    if (this.keyboard.isKeyPressed(chip8Key)) {
+      this.ip += 2;
+    }
   }
 
   sknpVx(x) {
-    // TODO implement
+    const chip8Key = this.registers[x];
+    if (!this.keyboard.isKeyPressed(chip8Key)) {
+      this.ip += 2;
+    }
   }
 
   ldVxDt(x) {
     // TODO implement
   }
 
-  ldVxK(x, key) {
-    // TODO implement
-    // stop execution until keypress
+  ldVxK(x) {
     this.running = false;
+    this.keyboard.waitForKeyPress((key) => {
+      this.registers[x] = key;
+      this.running = true;
+    })
   }
 
   ldDtVx(x) {
