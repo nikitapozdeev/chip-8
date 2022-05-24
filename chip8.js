@@ -1,5 +1,6 @@
 import { FONT_SPRITES } from "./font.js";
 import Keyboard from "./keyboard.js";
+import Speaker from './speaker.js';
 
 const canvas = document.getElementById('chip8');
 const context = canvas.getContext('2d');
@@ -66,6 +67,8 @@ class Chip8 {
     this.running = false;
 
     this.loadFont();
+
+    this.speaker = new Speaker();
     this.keyboard = new Keyboard();
   }
 
@@ -130,7 +133,29 @@ class Chip8 {
     }
 
     this.processInstruction();
+    this.updateTimers();
+    this.processAudio();
     this.draw();
+  }
+
+  updateTimers() {
+    if (this.dt > 0) {
+      this.dt--;
+    }
+
+    if (this.st > 0) {
+      this.st--;
+    }
+  }
+
+  processAudio() {
+    if (this.st > 0) {
+      this.speaker.play();
+    } else {
+      this.speaker.stop();
+    }
+  }
+
   processInstruction() {
     const opcode = this.getOpCode();
     const addr = opcode & 0xFFF;
@@ -216,7 +241,7 @@ class Chip8 {
 
   /** --------instructions-------- */
   sys(addr) {
-    //this.ip = addr;
+    this.ip = addr;
   }
   
   cls() {
@@ -390,7 +415,7 @@ class Chip8 {
   }
 
   ldVxDt(x) {
-    // TODO implement
+    this.registers[x] = this.dt;
   }
 
   ldVxK(x) {
@@ -402,11 +427,11 @@ class Chip8 {
   }
 
   ldDtVx(x) {
-    // TODO implement
+    this.dt = this.registers[x];
   }
 
   ldStVx(x) {
-    // TODO implement
+    this.st = this.registers[x];
   }
 
   addIVx(x) {
