@@ -105,6 +105,23 @@ class Chip8 {
   start() {
     this.running = true;
     console.log('power on');
+
+    const fps = 60;
+    const rate = 1000 / fps;
+    let lastTime;
+
+    const step = (timestamp) => {
+      if (lastTime) {
+        const delta = timestamp - lastTime;
+        // TODO: better solution
+        if (delta.toFixed(2) >= rate.toFixed(2)) {
+          this.tick();
+        }
+      }
+      lastTime = timestamp;
+      window.requestAnimationFrame(step);
+    }
+    window.requestAnimationFrame(step);
   }
 
   tick() {
@@ -112,6 +129,9 @@ class Chip8 {
       return;
     }
 
+    this.processInstruction();
+    this.draw();
+  processInstruction() {
     const opcode = this.getOpCode();
     const addr = opcode & 0xFFF;
     const nibble = opcode & 0xF;
@@ -119,12 +139,9 @@ class Chip8 {
     const y = opcode >> 4 & 0xF;
     const byte = opcode & 0xFF;
     
-    // TODO: remove 
-    console.log((this.ip - 2).toString(16).padStart(4, '0') + ' ' + opcode.toString(16))
-
-    if ((opcode & 0x0FFF) === 0x0FFF) {
+    /*if ((opcode & 0xF000) === 0x0000) {
       this.sys(addr);
-    } else if (opcode === 0x00E0) {
+    } else */if (opcode === 0x00E0) {
       this.cls();
     } else if (opcode === 0x00EE) {
       this.ret();
@@ -193,11 +210,8 @@ class Chip8 {
     } else if ((opcode & 0xF0FF) === 0xF065) {
       this.ldVxI(x);
     } else {
-      throw new Error('unknown command')
+      throw new Error('unknown command ' + opcode.toString(16).padStart(4, '0'))
     }
-
-    // TODO: remove, this is for debug only
-    this.draw();
   }
 
   /** --------instructions-------- */
@@ -453,18 +467,36 @@ const testOpcode = '/roms/test_opcode.ch8';
 const hello = '/roms/BMP Viewer - Hello (C8 example) [Hap, 2005].ch8';
 const random = '/roms/Random Number Test [Matthew Mikolay, 2010].ch8';
 const division = '/roms/Division Test [Sergey Naydenov, 2010].ch8';
+const clock = '/roms/Clock Program [Bill Fisher, 1981].ch8';
+const delayTimer = '/roms/Delay Timer Test [Matthew Mikolay, 2010].ch8';
+const life = '/roms/Life [GV Samways, 1980].ch8';
+const mazeAlt = '/roms/Maze (alt) [David Winter, 199x].ch8';
+const landing = '/roms/Landing.ch8';
+const lunar = '/roms/Lunar Lander (Udo Pernisz, 1979).ch8';
+const maze = '/roms/Maze [David Winter, 199x].ch8';
+const stars = '/roms/Stars [Sergey Naydenov, 2010].ch8';
+const particle = '/roms/Particle Demo [zeroZshadow, 2008].ch8';
+const october = '/roms/octojam1title.ch8';
+const october2 = '/roms/octojam2title.ch8';
+const octopeg = '/roms/octopeg.ch8';
+const superneatboy = '/roms/superneatboy.ch8';
+const evening = '/roms/anEveningToDieFor.ch8';
+const pong = '/roms/pong.ch8';
+const audioTest = '/roms/chip8-test-rom-with-audio.ch8';
+const breakout1 = '/roms/Breakout (Brix hack) [David Winter, 1997].ch8';
+const breakout2 = '/roms/Brick (Brix hack, 1990).ch8';
+const breakout3 = '/roms/Brix [Andreas Gustafsson, 1990].ch8';
 
-const chip8 = new Chip8();
-const response = fetch(division)
-  .then(response => response.arrayBuffer())
-  .then(buffer => new Uint8Array(buffer))
-  .then(rom => {
-    chip8.load(rom);
-    chip8.start();
+const startBtn = document.getElementById('start');
+startBtn.addEventListener('click', () => {
+  const chip8 = new Chip8();
+  const response = fetch(breakout1)
+    .then(response => response.arrayBuffer())
+    .then(buffer => new Uint8Array(buffer))
+    .then(rom => {
+      chip8.load(rom);
+      chip8.start();
+    })
+  
+    window.chip8 = chip8;
   })
-
-  window.chip8 = chip8;
-
-setInterval(() => {
-  chip8.tick();
-}, 0)
