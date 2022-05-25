@@ -7,13 +7,15 @@ const context = canvas.getContext('2d');
 
 const WIDTH = 64;
 const HEIGHT = 32;
+const BACK_COLOR = '#CADC9F';
+const FORE_COLOR = '#306230';
+const SCALE_FACTOR = 10;
 
-const scaleFactor = 4;
-// canvas.width *= scaleFactor;
-// canvas.height *= scaleFactor;
-context.fillStyle = '#000';
+canvas.width = WIDTH * SCALE_FACTOR;
+canvas.height = HEIGHT * SCALE_FACTOR;
+context.fillStyle = BACK_COLOR;
 context.fillRect(0, 0, canvas.width, canvas.height);
-context.scale(scaleFactor, scaleFactor);
+context.scale(SCALE_FACTOR, SCALE_FACTOR);
 
 class Chip8 {
   constructor() {
@@ -98,9 +100,9 @@ class Chip8 {
     for (let y = 0; y < HEIGHT; y++) {
       for (let x = 0; x < WIDTH; x++) {
         if (this.video[y][x] === 1) {
-          context.fillStyle = '#FFF';
+          context.fillStyle = FORE_COLOR;
         } else {
-          context.fillStyle = '#000';
+          context.fillStyle = BACK_COLOR;
         }
         context.fillRect(x, y, 1, 1);
       }
@@ -170,8 +172,8 @@ class Chip8 {
     const byte = opcode & 0xFF;
     
     /*if ((opcode & 0xF000) === 0x0000) {
-      this.sys(addr);
-    } else */if (opcode === 0x00E0) {
+      //this.sys(addr);
+    } else*/ if (opcode === 0x00E0) {
       this.cls();
     } else if (opcode === 0x00EE) {
       this.ret();
@@ -520,13 +522,13 @@ const breakout3 = '/roms/Brix [Andreas Gustafsson, 1990].ch8';
 const startBtn = document.getElementById('start');
 startBtn.addEventListener('click', () => {
   const chip8 = new Chip8();
-  const response = fetch(breakout1)
+  const response = fetch(october2)
     .then(response => response.arrayBuffer())
     .then(buffer => new Uint8Array(buffer))
     .then(rom => {
       chip8.load(rom);
       chip8.start();
-    })
+    });
   
     window.chip8 = chip8;
   })
