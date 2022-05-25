@@ -4,11 +4,20 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
   <title>Chip-8</title>
 </head>
 <body>
-  <canvas id="chip8"></canvas>
-  <button id="start">start</button>
+  <main class="content">
+    <header class="heading">Chip-8 emulator written in JS</header>
+    <section class="terminal">
+      <canvas id="chip8"></canvas>
+    </section>
+    <button id="start">start</button>
+  </main>
   <script src="chip8.js" type='module'></script>
 </body>
 </html>
