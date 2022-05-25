@@ -64,6 +64,8 @@ class Chip8 {
      */
     this.st = 0;
 
+    this.speed = 10;
+
     this.running = false;
 
     this.loadFont();
@@ -128,14 +130,17 @@ class Chip8 {
   }
 
   tick() {
-    if (!this.running) {
-      return;
+    for (let i = 0; i < this.speed; ++i) {
+      if (this.running) {
+        this.processInstruction();
+      }
     }
 
-    this.processInstruction();
-    this.updateTimers();
-    this.processAudio();
-    this.draw();
+    if (this.running) {
+      this.updateTimers();
+      this.processAudio();
+      this.draw();
+    }
   }
 
   updateTimers() {
