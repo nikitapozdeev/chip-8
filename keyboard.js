@@ -28,9 +28,9 @@ class Keyboard {
     if (chip8Key) {
       this.pressedKeys[chip8Key] = true;
 
-      if (this.keyPressCallback) {
-        this.keyPressCallback(chip8Key);
-        this.keyPressCallback = null;
+      if (this.waitForKeyPressCallback) {
+        this.waitForKeyPressCallback(chip8Key);
+        this.waitForKeyPressCallback = null;
       }
     }
   }
