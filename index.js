@@ -44,6 +44,10 @@ startBtn.addEventListener('click', () => {
     window.chip8 = chip8;
   });
 
+function setupRomsShelf() {
+  
+}
+
 // register listeners for on-screen keyboard
 function setupOnScreenKeyboard() {
   const keyboardElement = document.getElementById('keyboard');
