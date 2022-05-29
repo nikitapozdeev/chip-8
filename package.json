@@ -7,7 +7,7 @@
     "start": "webpack-dev-server --mode development --open",
     "build": "webpack --mode production",
     "predeploy": "npm run prepare-roms && npm run build",
-    "deploy": "gh-pages -d dist build",
+    "deploy": "gh-pages -d build",
     "prepare-roms": "node scripts/prepareRoms.js"
   },
   "repository": {
