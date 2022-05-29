@@ -126,7 +126,7 @@ body {
 .terminal {
   width: 740px;
   height: 620px;
-  background-image: url(old-terminal-art.png);
+  background-image: url(../assets/images/old-terminal-art.png);
 }
 
 .terminal canvas {
