@@ -113,10 +113,6 @@ body {
   text-align: center;
 }
 
-.footer {
-  text-align: center;
-}
-
 .emulator {
   display: flex;
   flex-direction: row;
@@ -194,4 +190,14 @@ body {
 
 .rom:hover {
   background-color: #64636580;
+}
+
+.nav-link {
+  color: #999;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  color: #ddd;
 }
