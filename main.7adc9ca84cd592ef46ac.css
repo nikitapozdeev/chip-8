@@ -1,0 +1,203 @@
+/* Box sizing rules */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Remove default margin */
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+/* Remove list styles on ul, ol elements with a list role, which suggests default styling will be removed */
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
+}
+
+/* Set core root defaults */
+html:focus-within {
+  scroll-behavior: smooth;
+}
+
+/* Set core body defaults */
+body {
+  min-height: 100vh;
+  text-rendering: optimizeSpeed;
+  line-height: 1.5;
+}
+
+/* A elements that don't have a class get default styles */
+a:not([class]) {
+  text-decoration-skip-ink: auto;
+}
+
+/* Make images easier to work with */
+img,
+picture {
+  max-width: 100%;
+  display: block;
+}
+
+/* Inherit fonts for inputs and buttons */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Remove all animations, transitions and smooth scroll for people that prefer not to see them */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+   scroll-behavior: auto;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  color: rgb(208, 213, 223);
+  background-color: rgb(23, 23, 23);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.wrapper {
+  margin: auto;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  display: flex;
+  gap: 1rem;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.header {
+  font-family: 'VT323', monospace;
+  font-size: 4rem;
+  text-align: center;
+}
+
+.emulator {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.terminal {
+  width: 740px;
+  height: 620px;
+  background-image: url(a7a22fa4f866e4d0bea9.png);
+}
+
+.terminal canvas {
+  margin: 50px;
+}
+
+.keyboard-container {
+  display: flex;
+  align-self: flex-end;
+}
+
+.keyboard {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  max-width: calc(4 * 2rem + 20px);
+
+  background: #868187;
+  border-left: 10px solid #646365;
+  border-bottom: 10px solid #646365;
+  border-top: 10px solid #b8b5b9;
+  border-right: 10px solid #b8b5b9;
+}
+
+.keyboard__key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.keyboard__key:hover {
+  background-color: #64636580;
+}
+
+.roms-container {
+  display: flex;
+  align-self: flex-end;
+}
+
+.roms {
+  min-width: calc(4 * 2rem);
+  background: #868187;
+  height: 620px;
+  max-width: 300px;
+  overflow-y: scroll;
+}
+
+.rom {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  border-left: 5px solid #646365;
+  border-bottom: 5px solid #646365;
+  border-top: 5px solid #b8b5b9;
+  border-right: 5px solid #b8b5b9;
+  cursor: pointer;
+}
+
+.rom:hover {
+  background-color: #64636580;
+}
+
+.nav-link {
+  color: #999;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  color: #ddd;
+}
