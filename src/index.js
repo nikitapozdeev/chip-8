@@ -3,9 +3,8 @@ import { createKeyboardEvent } from './utils.js';
 import roms from '../assets/data/roms.json';
 import './style.css';
 
-const chip8 = new Chip8();
-
 function loadRom(romName) {
+  const chip8 = new Chip8();
   fetch(`./roms/${romName}.ch8`)
     .then(response => response.arrayBuffer())
     .then(buffer => new Uint8Array(buffer))

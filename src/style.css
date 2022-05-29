@@ -177,10 +177,14 @@ body {
   min-width: calc(4 * 2rem);
   background: #868187;
   height: 620px;
+  max-width: 300px;
   overflow-y: scroll;
 }
 
 .rom {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
   border-left: 5px solid #646365;
   border-bottom: 5px solid #646365;
   border-top: 5px solid #b8b5b9;
