@@ -1,2 +1,9 @@
+# js
+build/
+node_modules/
+
+# other
 .DS_Store
 .vscode
+
+
