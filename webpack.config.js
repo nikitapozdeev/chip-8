@@ -28,6 +28,10 @@ module.exports = {
           from: path.resolve(__dirname, 'roms'), 
           to: path.resolve(__dirname, 'build/roms') 
         },
+        { 
+          from: path.resolve(__dirname, 'assets'), 
+          to: path.resolve(__dirname, 'build/assets') 
+        },
       ],
     }),
   ],
