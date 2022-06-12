@@ -32,7 +32,7 @@ class Chip8 {
     /**
      * 16 general purpose 8-bit registers.
      */
-    this.registers = new Uint8Array(16);
+    this.V = new Uint8Array(16);
 
     /**
      * 16-bit register. 
@@ -49,22 +49,22 @@ class Chip8 {
     /**
      * Instruction pointer or Program counter.
      */
-    this.ip = 0x200;
+    this.PC = 0x200;
 
     /**
      * Stack pointer point to the topmost level of the stack.
      */
-    this.sp = -1;
+    this.SP = -1;
 
     /**
      * Delay timer.
      */
-    this.dt = 0;  
+    this.DT = 0;  
 
     /**
      * Sound timer.
      */
-    this.st = 0;
+    this.ST = 0;
 
     this.speed = 10;
 
@@ -146,17 +146,17 @@ class Chip8 {
   }
 
   updateTimers() {
-    if (this.dt > 0) {
-      this.dt--;
+    if (this.DT > 0) {
+      this.DT--;
     }
 
-    if (this.st > 0) {
-      this.st--;
+    if (this.ST > 0) {
+      this.ST--;
     }
   }
 
   processAudio() {
-    if (this.st > 0) {
+    if (this.ST > 0) {
       this.speaker.play();
     } else {
       this.speaker.stop();
@@ -248,7 +248,7 @@ class Chip8 {
 
   /** --------instructions-------- */
   sys(addr) {
-    this.ip = addr;
+    this.PC = addr;
   }
   
   cls() {
@@ -256,119 +256,119 @@ class Chip8 {
   }
 
   ret() {
-    if (this.sp === -1) {
+    if (this.SP === -1) {
       throw new Error("Stack underflow");
     }
 
-    this.ip = this.stack[this.sp];
-    this.sp--;
+    this.PC = this.stack[this.SP];
+    this.SP--;
   }
 
   jp(addr) {
-    this.ip = addr;
+    this.PC = addr;
   }
   
   call(addr) {
-    this.sp++;
-    if (this.sp > this.stack.length) {
+    this.SP++;
+    if (this.SP > this.stack.length) {
       throw new Error("Stack overflow");
     }
 
-    this.stack[this.sp] = this.ip;
-    this.ip = addr;
+    this.stack[this.SP] = this.PC;
+    this.PC = addr;
   }
 
   seVx(register, byte) {
-    if (this.registers[register] === byte) {
-      this.ip += 2;
+    if (this.V[register] === byte) {
+      this.PC += 2;
     }
   }
 
   sneVx(register , byte) {
-    if (this.registers[register] !== byte) {
-      this.ip += 2;
+    if (this.V[register] !== byte) {
+      this.PC += 2;
     }
   }
 
   seVxVy(registerX, registerY) {
-    if (this.registers[registerX] === this.registers[registerY]) {
-      this.ip += 2;
+    if (this.V[registerX] === this.V[registerY]) {
+      this.PC += 2;
     }
   }
 
   ldVx(register, byte) {
-    this.registers[register] = byte;
+    this.V[register] = byte;
   }
 
   addVx(register, byte) {
-    this.registers[register] += byte;
+    this.V[register] += byte;
   }
 
   ldVxVy(registerX, registerY) {
-    this.registers[registerX] = this.registers[registerY];
+    this.V[registerX] = this.V[registerY];
   }
 
   orVxVy(registerX, registerY) {
-    this.registers[registerX] |= this.registers[registerY];
+    this.V[registerX] |= this.V[registerY];
   }
 
   andVxVy(registerX, registerY) {
-    this.registers[registerX] &= this.registers[registerY];
+    this.V[registerX] &= this.V[registerY];
   }
 
   xorVxVy(registerX, registerY) {
-    this.registers[registerX] ^= this.registers[registerY];
+    this.V[registerX] ^= this.V[registerY];
   }
 
   addVxVy(registerX, registerY) {
-    this.registers[registerX] += this.registers[registerY];
-    if (this.registers[registerX] > 0xFF) {
-      this.registers[registerX] &= 0xFF;
-      this.registers[0xF] = 1;
+    this.V[registerX] += this.V[registerY];
+    if (this.V[registerX] > 0xFF) {
+      this.V[registerX] &= 0xFF;
+      this.V[0xF] = 1;
     } else {
-      this.registers[0xF] = 0;
+      this.V[0xF] = 0;
     }
   }
 
   subVxVy(x, y) {
-    if (this.registers[x] > this.registers[y]) {
-      this.registers[0xF] = 1;
+    if (this.V[x] > this.V[y]) {
+      this.V[0xF] = 1;
     } else {
-      this.registers[0xF] = 0;
+      this.V[0xF] = 0;
     }
-    this.registers[x] -= this.registers[y];
+    this.V[x] -= this.V[y];
   }
 
   shrVx(x) {
-    if ((this.registers[x] & 0x00FF) === 0x00FF) {
-      this.registers[0xF] = 1;
+    if ((this.V[x] & 0x00FF) === 0x00FF) {
+      this.V[0xF] = 1;
     } else {
-      this.registers[0xF] = 0;
+      this.V[0xF] = 0;
     }
-    this.registers[x] = (this.registers[x] >> 1);
+    this.V[x] = (this.V[x] >> 1);
   }
 
   subnVxVy(x, y) {
-    if (this.registers[y] > this.registers[x]) {
-      this.registers[0xF] = 1;
+    if (this.V[y] > this.V[x]) {
+      this.V[0xF] = 1;
     } else {
-      this.registers[0xF] = 0;
+      this.V[0xF] = 0;
     }
-    this.registers[y] -= this.registers[x];
+    this.V[y] -= this.V[x];
   }
 
   shlVx(x) {
-    if ((this.registers[x] & 0xFF00) === 0xFF00) {
-      this.registers[0xF] = 1;
+    if ((this.V[x] & 0xFF00) === 0xFF00) {
+      this.V[0xF] = 1;
     } else {
-      this.registers[0xF] = 0;
+      this.V[0xF] = 0;
     }
-    this.registers[x] = (this.registers[x] << 1);
+    this.V[x] = (this.V[x] << 1);
   }
 
   sneVxVy(x, y) {
-    if (this.registers[x] !== this.registers[y]) {
-      this.ip += 2;
+    if (this.V[x] !== this.V[y]) {
+      this.PC += 2;
     }
   }
 
@@ -377,17 +377,17 @@ class Chip8 {
   }
 
   jpV0(addr) {
-    this.pc = addr + this.registers[0];
+    this.pc = addr + this.V[0];
   }
 
   rndVx(x, byte) {
     const rnd = Math.ceil(Math.random() * 256);
-    this.registers[x] = rnd & byte;
+    this.V[x] = rnd & byte;
   }
 
   drwVxVy(x, y, nibble) {
-    x = this.registers[x];
-    y = this.registers[y];
+    x = this.V[x];
+    y = this.V[y];
     let collide = false;
     const sprite = this.ram.slice(this.I, this.I + nibble);
     
@@ -402,55 +402,55 @@ class Chip8 {
         }
 
         this.video[row % HEIGHT][col % WIDTH] = pixelState;
-        this.registers[0xF] = collide ? 1 : 0;
+        this.V[0xF] = collide ? 1 : 0;
       }
     }
   }
 
   skpVx(x) {
-    const chip8Key = this.registers[x];
+    const chip8Key = this.V[x];
     if (this.keyboard.isKeyPressed(chip8Key)) {
-      this.ip += 2;
+      this.PC += 2;
     }
   }
 
   sknpVx(x) {
-    const chip8Key = this.registers[x];
+    const chip8Key = this.V[x];
     if (!this.keyboard.isKeyPressed(chip8Key)) {
-      this.ip += 2;
+      this.PC += 2;
     }
   }
 
   ldVxDt(x) {
-    this.registers[x] = this.dt;
+    this.V[x] = this.DT;
   }
 
   ldVxK(x) {
     this.running = false;
     this.keyboard.waitForKeyPress((key) => {
-      this.registers[x] = key;
+      this.V[x] = key;
       this.running = true;
     })
   }
 
   ldDtVx(x) {
-    this.dt = this.registers[x];
+    this.DT = this.V[x];
   }
 
   ldStVx(x) {
-    this.st = this.registers[x];
+    this.ST = this.V[x];
   }
 
   addIVx(x) {
-    this.I += this.registers[x];
+    this.I += this.V[x];
   }
 
   ldFVx(x) {
-    this.I = this.registers[x] * 5;
+    this.I = this.V[x] * 5;
   }
 
   ldBVx(x) {
-    let value = this.registers[x];
+    let value = this.V[x];
 
     const a = Math.floor(value / 100);
     value = value - a * 100;
@@ -465,19 +465,19 @@ class Chip8 {
 
   ldIVx(x) {
     for (let r = 0; r <= x; r++) {
-      this.ram[this.I + r] = this.registers[r];
+      this.ram[this.I + r] = this.V[r];
     }
   }
 
   ldVxI(x) {
     for (let r = 0; r <= x; r++) {
-      this.registers[r] = this.ram[this.I + r];
+      this.V[r] = this.ram[this.I + r];
     }
   }
 
   getOpCode() {
-    const high = this.ram[this.ip++];
-    const low = this.ram[this.ip++];
+    const high = this.ram[this.PC++];
+    const low = this.ram[this.PC++];
     return high << 8 | low
   }
 
@@ -487,7 +487,7 @@ class Chip8 {
    */
   load(rom) {
     for (let i = 0; i < rom.byteLength; i++) {
-      this.ram[this.ip + i] = rom[i];
+      this.ram[this.PC + i] = rom[i];
     }
   }
 }
