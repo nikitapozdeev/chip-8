@@ -1,5 +1,5 @@
 # chip-8
-Yet another chip-8 :tv: emulator written in JS just for fun and practice.
+Yet another chip-8 :tv: emulator written in TS just for fun and practice.
 
 ##### [Try it online](https://nikitapozdeev.github.io/chip-8/)
 

@@ -1,4 +1,4 @@
-export function createKeyboardEvent(type, keyCode) {
+export function createKeyboardEvent(type: string, keyCode: number) {
   const syntheticEvent = new KeyboardEvent(
     type, 
     { 'keyCode': keyCode }

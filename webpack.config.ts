@@ -1,17 +1,15 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+import path from 'path';
+import type { Configuration as WebpackConfiguration } from 'webpack';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
-module.exports = {
-  entry: './src/index.js',
+const config: WebpackConfiguration = {
+  entry: './src/index.ts',
   output: {
     filename: 'bundle.[chunkhash].js',
     path: path.resolve(__dirname, 'build'),
     clean: true
-  },
-  devServer: {
-    port: 3000
   },
   plugins: [
     new MiniCssExtractPlugin({
@@ -21,7 +19,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './src/index.html'
     }),
-    
     new CopyWebpackPlugin({
       patterns: [
         { 
@@ -38,9 +35,19 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+      {
         test: /\.css$/i,
         use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
     ],
   },
+  resolve: {
+    extensions: ['.ts', '.js', '.json']
+  }
 }
+
+export default config;

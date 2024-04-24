@@ -1,9 +1,16 @@
-import { FONT_SPRITES } from "./font.js";
-import Keyboard from "./keyboard.js";
-import Speaker from './speaker.js';
+import { FONT_SPRITES } from "./font";
+import Keyboard from "./keyboard";
+import Speaker from './speaker';
 
-const canvas = document.getElementById('chip8');
+const canvas = document.getElementById('chip8') as HTMLCanvasElement;
+if (!canvas) {
+  throw new Error('Canvas not found');
+}
+
 const context = canvas.getContext('2d');
+if (!context) {
+  throw new Error('Cant get 2d context');
+}
 
 const WIDTH = 64;
 const HEIGHT = 32;
@@ -18,62 +25,79 @@ context.fillRect(0, 0, canvas.width, canvas.height);
 context.scale(SCALE_FACTOR, SCALE_FACTOR);
 
 class Chip8 {
+  /**
+   * RAM 4KB.
+   */
+  private readonly ram: Uint8Array;
+
+  /**
+   * Video memory.
+   */
+  private video: number[][];
+
+  /**
+   * 16 general purpose 8-bit registers.
+   */
+  private readonly V: Uint8Array;
+
+  /**
+   * Stack 16 levels by 16 bit.
+   */
+  private readonly stack: Uint16Array;
+
+  /**
+   * 16-bit register. 
+   * This register is generally used to store memory addresses, 
+   * so only the lowest (rightmost) 12 bits are usually used.
+   */
+  private I: number;
+
+  /**
+  * Instruction pointer or Program counter.
+  */
+  private PC: number;
+
+  /**
+   * Stack pointer point to the topmost level of the stack.
+   */
+  private SP: number;
+
+  /**
+   * Delay timer.
+   */
+  private DT: number;  
+
+  /**
+   * Sound timer.
+   */
+  private ST: number;
+
+  /**
+   * Emulation speed;
+   */
+  private speed: number;
+
+  private running: boolean;
+
+  private readonly speaker: Speaker;
+
+  private readonly keyboard: Keyboard;
+
   constructor() {
-    /**
-     * RAM 4KB.
-     */
     this.ram = new Uint8Array(4096);
-
-    /**
-     * Video memory.
-     */
     this.video = this.createVideo();
-
-    /**
-     * 16 general purpose 8-bit registers.
-     */
     this.V = new Uint8Array(16);
-
-    /**
-     * 16-bit register. 
-     * This register is generally used to store memory addresses, 
-     * so only the lowest (rightmost) 12 bits are usually used.
-     */
-    this.I = 0x0000;
-
-    /**
-     * Stack 16 levels by 16 bit.
-     */
     this.stack = new Uint16Array(16);
-    
-    /**
-     * Instruction pointer or Program counter.
-     */
+    this.I = 0x0000;
     this.PC = 0x200;
-
-    /**
-     * Stack pointer point to the topmost level of the stack.
-     */
     this.SP = -1;
-
-    /**
-     * Delay timer.
-     */
     this.DT = 0;  
-
-    /**
-     * Sound timer.
-     */
     this.ST = 0;
-
     this.speed = 10;
-
     this.running = false;
-
-    this.loadFont();
-
     this.speaker = new Speaker();
     this.keyboard = new Keyboard();
+    this.loadFont();
   }
 
   createVideo() {
@@ -115,9 +139,9 @@ class Chip8 {
 
     const fps = 60;
     const rate = 1000 / fps;
-    let lastTime;
+    let lastTime: number | null = null;
 
-    const step = (timestamp) => {
+    const step = (timestamp: number) => {
       if (lastTime) {
         const delta = timestamp - lastTime;
         // TODO: better solution
@@ -247,7 +271,7 @@ class Chip8 {
   }
 
   /** --------instructions-------- */
-  sys(addr) {
+  sys(addr: number) {
     this.PC = addr;
   }
   
@@ -264,11 +288,11 @@ class Chip8 {
     this.SP--;
   }
 
-  jp(addr) {
+  jp(addr: number) {
     this.PC = addr;
   }
   
-  call(addr) {
+  call(addr: number) {
     this.SP++;
     if (this.SP > this.stack.length) {
       throw new Error("Stack overflow");
@@ -278,49 +302,49 @@ class Chip8 {
     this.PC = addr;
   }
 
-  seVx(register, byte) {
+  seVx(register: number, byte: number) {
     if (this.V[register] === byte) {
       this.PC += 2;
     }
   }
 
-  sneVx(register , byte) {
+  sneVx(register: number, byte: number) {
     if (this.V[register] !== byte) {
       this.PC += 2;
     }
   }
 
-  seVxVy(registerX, registerY) {
+  seVxVy(registerX: number, registerY: number) {
     if (this.V[registerX] === this.V[registerY]) {
       this.PC += 2;
     }
   }
 
-  ldVx(register, byte) {
+  ldVx(register: number, byte: number) {
     this.V[register] = byte;
   }
 
-  addVx(register, byte) {
+  addVx(register: number, byte: number) {
     this.V[register] += byte;
   }
 
-  ldVxVy(registerX, registerY) {
+  ldVxVy(registerX: number, registerY: number) {
     this.V[registerX] = this.V[registerY];
   }
 
-  orVxVy(registerX, registerY) {
+  orVxVy(registerX: number, registerY: number) {
     this.V[registerX] |= this.V[registerY];
   }
 
-  andVxVy(registerX, registerY) {
+  andVxVy(registerX: number, registerY: number) {
     this.V[registerX] &= this.V[registerY];
   }
 
-  xorVxVy(registerX, registerY) {
+  xorVxVy(registerX: number, registerY: number) {
     this.V[registerX] ^= this.V[registerY];
   }
 
-  addVxVy(registerX, registerY) {
+  addVxVy(registerX: number, registerY: number) {
     this.V[registerX] += this.V[registerY];
     if (this.V[registerX] > 0xFF) {
       this.V[registerX] &= 0xFF;
@@ -330,7 +354,7 @@ class Chip8 {
     }
   }
 
-  subVxVy(x, y) {
+  subVxVy(x: number, y: number) {
     if (this.V[x] > this.V[y]) {
       this.V[0xF] = 1;
     } else {
@@ -339,7 +363,7 @@ class Chip8 {
     this.V[x] -= this.V[y];
   }
 
-  shrVx(x) {
+  shrVx(x: number) {
     if ((this.V[x] & 0x00FF) === 0x00FF) {
       this.V[0xF] = 1;
     } else {
@@ -348,7 +372,7 @@ class Chip8 {
     this.V[x] = (this.V[x] >> 1);
   }
 
-  subnVxVy(x, y) {
+  subnVxVy(x: number, y: number) {
     if (this.V[y] > this.V[x]) {
       this.V[0xF] = 1;
     } else {
@@ -357,7 +381,7 @@ class Chip8 {
     this.V[y] -= this.V[x];
   }
 
-  shlVx(x) {
+  shlVx(x: number) {
     if ((this.V[x] & 0xFF00) === 0xFF00) {
       this.V[0xF] = 1;
     } else {
@@ -366,26 +390,26 @@ class Chip8 {
     this.V[x] = (this.V[x] << 1);
   }
 
-  sneVxVy(x, y) {
+  sneVxVy(x: number, y: number) {
     if (this.V[x] !== this.V[y]) {
       this.PC += 2;
     }
   }
 
-  ld(addr) {
+  ld(addr: number) {
     this.I = addr;
   }
 
-  jpV0(addr) {
-    this.pc = addr + this.V[0];
+  jpV0(addr: number) {
+    this.PC = addr + this.V[0];
   }
 
-  rndVx(x, byte) {
+  rndVx(x: number, byte: number) {
     const rnd = Math.ceil(Math.random() * 256);
     this.V[x] = rnd & byte;
   }
 
-  drwVxVy(x, y, nibble) {
+  drwVxVy(x: number, y: number, nibble: number) {
     x = this.V[x];
     y = this.V[y];
     let collide = false;
@@ -407,25 +431,25 @@ class Chip8 {
     }
   }
 
-  skpVx(x) {
+  skpVx(x: number) {
     const chip8Key = this.V[x];
     if (this.keyboard.isKeyPressed(chip8Key)) {
       this.PC += 2;
     }
   }
 
-  sknpVx(x) {
+  sknpVx(x: number) {
     const chip8Key = this.V[x];
     if (!this.keyboard.isKeyPressed(chip8Key)) {
       this.PC += 2;
     }
   }
 
-  ldVxDt(x) {
+  ldVxDt(x: number) {
     this.V[x] = this.DT;
   }
 
-  ldVxK(x) {
+  ldVxK(x: number) {
     this.running = false;
     this.keyboard.waitForKeyPress((key) => {
       this.V[x] = key;
@@ -433,23 +457,23 @@ class Chip8 {
     })
   }
 
-  ldDtVx(x) {
+  ldDtVx(x: number) {
     this.DT = this.V[x];
   }
 
-  ldStVx(x) {
+  ldStVx(x: number) {
     this.ST = this.V[x];
   }
 
-  addIVx(x) {
+  addIVx(x: number) {
     this.I += this.V[x];
   }
 
-  ldFVx(x) {
+  ldFVx(x: number) {
     this.I = this.V[x] * 5;
   }
 
-  ldBVx(x) {
+  ldBVx(x: number) {
     let value = this.V[x];
 
     const a = Math.floor(value / 100);
@@ -463,13 +487,13 @@ class Chip8 {
     this.ram[this.I + 2] = c;
   }
 
-  ldIVx(x) {
+  ldIVx(x: number) {
     for (let r = 0; r <= x; r++) {
       this.ram[this.I + r] = this.V[r];
     }
   }
 
-  ldVxI(x) {
+  ldVxI(x: number) {
     for (let r = 0; r <= x; r++) {
       this.V[r] = this.ram[this.I + r];
     }
@@ -483,9 +507,8 @@ class Chip8 {
 
   /**
    * Loads rom into RAM.
-   * @param {Uint8Array} rom
    */
-  load(rom) {
+  load(rom: Uint8Array) {
     for (let i = 0; i < rom.byteLength; i++) {
       this.ram[this.PC + i] = rom[i];
     }

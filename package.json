@@ -2,13 +2,12 @@
   "name": "chip-8",
   "version": "1.0.0",
   "description": "yet another chip-8 :tv: emulator written in JS just for fun and practice.",
-  "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --mode development --open",
     "build": "webpack --mode production",
     "predeploy": "npm run prepare-roms && npm run build",
     "deploy": "gh-pages -d build",
-    "prepare-roms": "node scripts/prepareRoms.js"
+    "prepare-roms": "node scripts/prepare-roms.ts"
   },
   "repository": {
     "type": "git",
@@ -27,12 +26,17 @@
   },
   "homepage": "https://nikitapozdeev.github.io/chip-8",
   "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@types/webpack": "^5.28.5",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",
     "gh-pages": "^4.0.0",
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.6.0",
     "style-loader": "^3.3.1",
+    "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5",
     "webpack": "^5.72.1",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.9.0"
