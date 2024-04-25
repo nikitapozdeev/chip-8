@@ -4,10 +4,12 @@
   "description": "yet another chip-8 :tv: emulator written in JS just for fun and practice.",
   "scripts": {
     "start": "webpack-dev-server --mode development --open",
-    "build": "webpack --mode production",
-    "predeploy": "npm run prepare-roms && npm run build",
-    "deploy": "gh-pages -d build",
-    "prepare-roms": "node scripts/prepare-roms.ts"
+    "build": "npm run prepare-roms && webpack --mode production",
+    "deploy": "npm run build && gh-pages -d build",
+    "prepare-roms": "ts-node scripts/prepare-roms.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "prettier --write \"./src/**/*.+(js|jsx|ts|tsx|css|md)\" && eslint ./src --fix",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -25,14 +27,28 @@
     "url": "https://github.com/nikitapozdeev/chip-8/issues"
   },
   "homepage": "https://nikitapozdeev.github.io/chip-8",
+  "lint-staged": {
+    "./src/**/*.+(js|jsx|ts|tsx|css|md)": "prettier --write",
+    "./src/**/*.(js|jsx|ts|tsx)": "eslint --fix"
+  },
   "devDependencies": {
     "@types/node": "^20.12.7",
     "@types/webpack": "^5.28.5",
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-unused-imports": "^3.1.0",
     "gh-pages": "^4.0.0",
     "html-webpack-plugin": "^5.5.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
     "mini-css-extract-plugin": "^2.6.0",
+    "prettier": "^3.2.5",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",

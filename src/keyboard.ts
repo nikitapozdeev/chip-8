@@ -9,10 +9,22 @@ class Keyboard {
    *  A	0	B	F -> Z X C V
    */
   private readonly keyMap: Record<number, number> = {
-    49: 0x1, 50: 0x2, 51: 0x3, 52: 0xC,
-    81: 0x4, 87: 0x5, 69: 0x6, 82: 0xD,
-    65: 0x7, 83: 0x8, 68: 0x9, 70: 0xE,
-    90: 0xA, 88: 0x0, 67: 0xB, 86: 0xF,
+    49: 0x1,
+    50: 0x2,
+    51: 0x3,
+    52: 0xc,
+    81: 0x4,
+    87: 0x5,
+    69: 0x6,
+    82: 0xd,
+    65: 0x7,
+    83: 0x8,
+    68: 0x9,
+    70: 0xe,
+    90: 0xa,
+    88: 0x0,
+    67: 0xb,
+    86: 0xf,
   } as const;
 
   private pressedKeys: Set<number> = new Set();
@@ -24,9 +36,9 @@ class Keyboard {
   }
 
   private subscribeToEvents = () => {
-    window.addEventListener('keydown', this.onKeyDownEvent.bind(this))
-    window.addEventListener('keyup', this.onKeyUpEvent.bind(this))
-  }
+    window.addEventListener('keydown', this.onKeyDownEvent.bind(this));
+    window.addEventListener('keyup', this.onKeyUpEvent.bind(this));
+  };
 
   onKeyDownEvent({ keyCode }: KeyboardEvent) {
     const chip8Key = this.keyMap[keyCode];
