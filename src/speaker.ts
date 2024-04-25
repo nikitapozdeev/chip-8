@@ -4,7 +4,7 @@ class Speaker {
   private isStarted: boolean;
 
   constructor() {
-    this.context = new (window.AudioContext || window.webkitAudioContext);
+    this.context = new (window.AudioContext || window.webkitAudioContext)();
     this.oscillator = this.context.createOscillator();
     this.oscillator.connect(this.context.destination);
     this.isStarted = false;
@@ -17,7 +17,7 @@ class Speaker {
       this.oscillator.frequency.setTargetAtTime(440, this.context.currentTime, 0);
       this.oscillator.start(0);
       this.isStarted = true;
-    } 
+    }
   }
 
   stop() {

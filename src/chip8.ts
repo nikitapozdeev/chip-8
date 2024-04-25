@@ -1,30 +1,10 @@
-import { FONT_SPRITES } from "./font";
-import Keyboard from "./keyboard";
+import { BACK_COLOR, FORE_COLOR, HEIGHT, WIDTH } from './constants';
+import { FONT_SPRITES } from './font';
+import Keyboard from './keyboard';
 import Speaker from './speaker';
 
-const canvas = document.getElementById('chip8') as HTMLCanvasElement;
-if (!canvas) {
-  throw new Error('Canvas not found');
-}
-
-const context = canvas.getContext('2d');
-if (!context) {
-  throw new Error('Cant get 2d context');
-}
-
-const WIDTH = 64;
-const HEIGHT = 32;
-const BACK_COLOR = '#CADC9F';
-const FORE_COLOR = '#306230';
-const SCALE_FACTOR = 10;
-
-canvas.width = WIDTH * SCALE_FACTOR;
-canvas.height = HEIGHT * SCALE_FACTOR;
-context.fillStyle = BACK_COLOR;
-context.fillRect(0, 0, canvas.width, canvas.height);
-context.scale(SCALE_FACTOR, SCALE_FACTOR);
-
 class Chip8 {
+  private readonly context: CanvasRenderingContext2D;
   /**
    * RAM 4KB.
    */
@@ -46,15 +26,15 @@ class Chip8 {
   private readonly stack: Uint16Array;
 
   /**
-   * 16-bit register. 
-   * This register is generally used to store memory addresses, 
+   * 16-bit register.
+   * This register is generally used to store memory addresses,
    * so only the lowest (rightmost) 12 bits are usually used.
    */
   private I: number;
 
   /**
-  * Instruction pointer or Program counter.
-  */
+   * Instruction pointer or Program counter.
+   */
   private PC: number;
 
   /**
@@ -65,7 +45,7 @@ class Chip8 {
   /**
    * Delay timer.
    */
-  private DT: number;  
+  private DT: number;
 
   /**
    * Sound timer.
@@ -83,7 +63,8 @@ class Chip8 {
 
   private readonly keyboard: Keyboard;
 
-  constructor() {
+  constructor(context: CanvasRenderingContext2D) {
+    this.context = context;
     this.ram = new Uint8Array(4096);
     this.video = this.createVideo();
     this.V = new Uint8Array(16);
@@ -91,7 +72,7 @@ class Chip8 {
     this.I = 0x0000;
     this.PC = 0x200;
     this.SP = -1;
-    this.DT = 0;  
+    this.DT = 0;
     this.ST = 0;
     this.speed = 10;
     this.running = false;
@@ -124,11 +105,11 @@ class Chip8 {
     for (let y = 0; y < HEIGHT; y++) {
       for (let x = 0; x < WIDTH; x++) {
         if (this.video[y][x] === 1) {
-          context.fillStyle = FORE_COLOR;
+          this.context.fillStyle = FORE_COLOR;
         } else {
-          context.fillStyle = BACK_COLOR;
+          this.context.fillStyle = BACK_COLOR;
         }
-        context.fillRect(x, y, 1, 1);
+        this.context.fillRect(x, y, 1, 1);
       }
     }
   }
@@ -151,7 +132,7 @@ class Chip8 {
       }
       lastTime = timestamp;
       window.requestAnimationFrame(step);
-    }
+    };
     window.requestAnimationFrame(step);
   }
 
@@ -189,84 +170,84 @@ class Chip8 {
 
   processInstruction() {
     const opcode = this.getOpCode();
-    const addr = opcode & 0xFFF;
-    const nibble = opcode & 0xF;
-    const x = opcode >> 8 & 0xF;
-    const y = opcode >> 4 & 0xF;
-    const byte = opcode & 0xFF;
-    
+    const addr = opcode & 0xfff;
+    const nibble = opcode & 0xf;
+    const x = (opcode >> 8) & 0xf;
+    const y = (opcode >> 4) & 0xf;
+    const byte = opcode & 0xff;
+
     /*if ((opcode & 0xF000) === 0x0000) {
       //this.sys(addr);
-    } else*/ if (opcode === 0x00E0) {
+    } else*/ if (opcode === 0x00e0) {
       this.cls();
-    } else if (opcode === 0x00EE) {
+    } else if (opcode === 0x00ee) {
       this.ret();
-    } else if ((opcode & 0xF000) === 0x1000) {
+    } else if ((opcode & 0xf000) === 0x1000) {
       this.jp(addr);
-    } else if ((opcode & 0xF000) === 0x2000) {
+    } else if ((opcode & 0xf000) === 0x2000) {
       this.call(addr);
-    } else if ((opcode & 0xF000) === 0x3000) {
+    } else if ((opcode & 0xf000) === 0x3000) {
       this.seVx(x, byte);
-    } else if ((opcode & 0xF000) === 0x4000) {
+    } else if ((opcode & 0xf000) === 0x4000) {
       this.sneVx(x, byte);
-    } else if ((opcode & 0xF000) === 0x5000) {
+    } else if ((opcode & 0xf000) === 0x5000) {
       this.seVxVy(x, y);
-    } else if ((opcode & 0xF000) === 0x6000) {
+    } else if ((opcode & 0xf000) === 0x6000) {
       this.ldVx(x, byte);
-    } else if ((opcode & 0xF000) === 0x7000) {
+    } else if ((opcode & 0xf000) === 0x7000) {
       this.addVx(x, byte);
-    } else if ((opcode & 0xF00F) === 0x8000) {
+    } else if ((opcode & 0xf00f) === 0x8000) {
       this.ldVxVy(x, y);
-    } else if ((opcode & 0xF00F) === 0x8001) {
+    } else if ((opcode & 0xf00f) === 0x8001) {
       this.orVxVy(x, y);
-    } else if ((opcode & 0xF00F) === 0x8002) {
+    } else if ((opcode & 0xf00f) === 0x8002) {
       this.andVxVy(x, y);
-    } else if ((opcode & 0xF00F) === 0x8003) {
+    } else if ((opcode & 0xf00f) === 0x8003) {
       this.xorVxVy(x, y);
-    } else if ((opcode & 0xF00F) === 0x8004) {
+    } else if ((opcode & 0xf00f) === 0x8004) {
       this.addVxVy(x, y);
-    } else if ((opcode & 0xF00F) === 0x8005) {
+    } else if ((opcode & 0xf00f) === 0x8005) {
       this.subVxVy(x, y);
-    } else if ((opcode & 0xF00F) === 0x8006) {
+    } else if ((opcode & 0xf00f) === 0x8006) {
       this.shrVx(x);
-    } else if ((opcode & 0xF00F) === 0x8007) {
+    } else if ((opcode & 0xf00f) === 0x8007) {
       this.subnVxVy(x, y);
-    } else if ((opcode & 0xF00F) === 0x800E) {
+    } else if ((opcode & 0xf00f) === 0x800e) {
       this.shlVx(x);
-    } else if ((opcode & 0xF00F) === 0x9000) {
+    } else if ((opcode & 0xf00f) === 0x9000) {
       this.sneVxVy(x, y);
-    } else if ((opcode & 0xF000) === 0xA000) {
+    } else if ((opcode & 0xf000) === 0xa000) {
       this.ld(addr);
-    } else if ((opcode & 0xF000) === 0xB000) {
+    } else if ((opcode & 0xf000) === 0xb000) {
       this.jpV0(addr);
-    } else if ((opcode & 0xF000) === 0xC000) {
+    } else if ((opcode & 0xf000) === 0xc000) {
       this.rndVx(x, byte);
-    } else if ((opcode & 0xF000) === 0xD000) {
+    } else if ((opcode & 0xf000) === 0xd000) {
       this.drwVxVy(x, y, nibble);
-    } else if ((opcode & 0xF0FF) === 0xE09E) {
+    } else if ((opcode & 0xf0ff) === 0xe09e) {
       this.skpVx(x);
-    } else if ((opcode & 0xF0FF) === 0xE0A1) {
+    } else if ((opcode & 0xf0ff) === 0xe0a1) {
       this.sknpVx(x);
-    } else if ((opcode & 0xF0FF) === 0xF007) {
+    } else if ((opcode & 0xf0ff) === 0xf007) {
       this.ldVxDt(x);
-    } else if ((opcode & 0xF0FF) === 0xF00A) {
+    } else if ((opcode & 0xf0ff) === 0xf00a) {
       this.ldVxK(x);
-    } else if ((opcode & 0xF0FF) === 0xF015) {
+    } else if ((opcode & 0xf0ff) === 0xf015) {
       this.ldDtVx(x);
-    } else if ((opcode & 0xF0FF) === 0xF018) {
+    } else if ((opcode & 0xf0ff) === 0xf018) {
       this.ldStVx(x);
-    } else if ((opcode & 0xF0FF) === 0xF01E) {
+    } else if ((opcode & 0xf0ff) === 0xf01e) {
       this.addIVx(x);
-    } else if ((opcode & 0xF0FF) === 0xF029) {
+    } else if ((opcode & 0xf0ff) === 0xf029) {
       this.ldFVx(x);
-    } else if ((opcode & 0xF0FF) === 0xF033) {
+    } else if ((opcode & 0xf0ff) === 0xf033) {
       this.ldBVx(x);
-    } else if ((opcode & 0xF0FF) === 0xF055) {
+    } else if ((opcode & 0xf0ff) === 0xf055) {
       this.ldIVx(x);
-    } else if ((opcode & 0xF0FF) === 0xF065) {
+    } else if ((opcode & 0xf0ff) === 0xf065) {
       this.ldVxI(x);
     } else {
-      throw new Error('unknown command ' + opcode.toString(16).padStart(4, '0'))
+      throw new Error('unknown command ' + opcode.toString(16).padStart(4, '0'));
     }
   }
 
@@ -274,14 +255,14 @@ class Chip8 {
   sys(addr: number) {
     this.PC = addr;
   }
-  
+
   cls() {
     this.video = this.createVideo();
   }
 
   ret() {
     if (this.SP === -1) {
-      throw new Error("Stack underflow");
+      throw new Error('Stack underflow');
     }
 
     this.PC = this.stack[this.SP];
@@ -291,11 +272,11 @@ class Chip8 {
   jp(addr: number) {
     this.PC = addr;
   }
-  
+
   call(addr: number) {
     this.SP++;
     if (this.SP > this.stack.length) {
-      throw new Error("Stack overflow");
+      throw new Error('Stack overflow');
     }
 
     this.stack[this.SP] = this.PC;
@@ -346,48 +327,48 @@ class Chip8 {
 
   addVxVy(registerX: number, registerY: number) {
     this.V[registerX] += this.V[registerY];
-    if (this.V[registerX] > 0xFF) {
-      this.V[registerX] &= 0xFF;
-      this.V[0xF] = 1;
+    if (this.V[registerX] > 0xff) {
+      this.V[registerX] &= 0xff;
+      this.V[0xf] = 1;
     } else {
-      this.V[0xF] = 0;
+      this.V[0xf] = 0;
     }
   }
 
   subVxVy(x: number, y: number) {
     if (this.V[x] > this.V[y]) {
-      this.V[0xF] = 1;
+      this.V[0xf] = 1;
     } else {
-      this.V[0xF] = 0;
+      this.V[0xf] = 0;
     }
     this.V[x] -= this.V[y];
   }
 
   shrVx(x: number) {
-    if ((this.V[x] & 0x00FF) === 0x00FF) {
-      this.V[0xF] = 1;
+    if ((this.V[x] & 0x00ff) === 0x00ff) {
+      this.V[0xf] = 1;
     } else {
-      this.V[0xF] = 0;
+      this.V[0xf] = 0;
     }
-    this.V[x] = (this.V[x] >> 1);
+    this.V[x] = this.V[x] >> 1;
   }
 
   subnVxVy(x: number, y: number) {
     if (this.V[y] > this.V[x]) {
-      this.V[0xF] = 1;
+      this.V[0xf] = 1;
     } else {
-      this.V[0xF] = 0;
+      this.V[0xf] = 0;
     }
     this.V[y] -= this.V[x];
   }
 
   shlVx(x: number) {
-    if ((this.V[x] & 0xFF00) === 0xFF00) {
-      this.V[0xF] = 1;
+    if ((this.V[x] & 0xff00) === 0xff00) {
+      this.V[0xf] = 1;
     } else {
-      this.V[0xF] = 0;
+      this.V[0xf] = 0;
     }
-    this.V[x] = (this.V[x] << 1);
+    this.V[x] = this.V[x] << 1;
   }
 
   sneVxVy(x: number, y: number) {
@@ -414,7 +395,7 @@ class Chip8 {
     y = this.V[y];
     let collide = false;
     const sprite = this.ram.slice(this.I, this.I + nibble);
-    
+
     for (let j = 0; j < sprite.length; j++) {
       const rowPixels = sprite[j].toString(2).padStart(8, '0').split('').map(Number);
       for (let i = 0; i < rowPixels.length; i++) {
@@ -426,7 +407,7 @@ class Chip8 {
         }
 
         this.video[row % HEIGHT][col % WIDTH] = pixelState;
-        this.V[0xF] = collide ? 1 : 0;
+        this.V[0xf] = collide ? 1 : 0;
       }
     }
   }
@@ -454,7 +435,7 @@ class Chip8 {
     this.keyboard.waitForKeyPress((key) => {
       this.V[x] = key;
       this.running = true;
-    })
+    });
   }
 
   ldDtVx(x: number) {
@@ -502,7 +483,7 @@ class Chip8 {
   getOpCode() {
     const high = this.ram[this.PC++];
     const low = this.ram[this.PC++];
-    return high << 8 | low
+    return (high << 8) | low;
   }
 
   /**

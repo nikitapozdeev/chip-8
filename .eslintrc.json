@@ -1,0 +1,42 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "unused-imports"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:import/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    },
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
+  },
+  "rules": {
+    "no-useless-escape": "off",
+    "import/no-unresolved": "warn",
+    "react/react-in-jsx-scope": "off",
+    "unused-imports/no-unused-imports": "error",
+    "semi": ["error", "always"],
+    "react/jsx-curly-brace-presence": [
+      "error",
+      {
+        "props": "never",
+        "children": "never"
+      }
+    ],
+    "@typescript-eslint/no-namespace": "off"
+  },
+  "globals": {
+    "window": true
+  }
+}

@@ -4,9 +4,12 @@
     "noImplicitAny": true,
     "module": "NodeNext",
     "target": "es5",
-    "jsx": "react",
-    "allowJs": true,
+    "jsx": "react-jsx",
+    "allowJs": false,
     "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
   }
 }
